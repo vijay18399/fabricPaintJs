@@ -5,10 +5,14 @@
     <meta charset="utf-8">
 
     <title>Free drawing | Fabric.js Demos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <script src="./fabric.js"></script>
-    <script src="./q-floodfill.js"></script>
+    <script src="https://unpkg.com/fabric@latest/src/mixins/eraser_brush.mixin.js"></script>
+    <script src="./filler.js"></script>
     <script src="./history.js"></script>
     <script src="./paint.brush.js"></script>
+    <script src="./image.brush.js"></script>
    <style>
         body{
             margin: 0px;
@@ -63,6 +67,8 @@
                 <select id="drawing-mode-selector">
                     <option>Pencil</option>
                     <option>paint</option>
+                    <option>frog</option>
+                    <option>eraser</option>
                     <option>Circle</option>
                     <option>Spray</option>
                     <option>Pattern</option>
@@ -102,12 +108,19 @@
             
                 var canvas = this.__canvas = new fabric.Canvas('c', {
                     isDrawingMode: true,
-                    width: window.innerWidth,
-                    height:window.innerHeight - 50
+                    width:window.innerWidth-10,
+                    height:window.innerHeight-10
                 });
 
                 fabric.Object.prototype.transparentCorners = false;
-
+                fabric.Image.fromURL('https://www.shutterstock.com/image-vector/cute-funny-coloring-page-rocket-600nw-1893601582.jpg', function(img) {
+                    img.set({
+                        left: 0,
+                        top: 0,
+                    });
+                    canvas.add(img);
+                    canvas.renderAll();
+                    },{crossOrigin: 'anonymous'});
                 var drawingModeEl = $('drawing-mode'),
                     drawingOptionsEl = $('drawing-mode-options'),
                     drawingColorEl = $('drawing-color'),
@@ -136,6 +149,14 @@
                 };
 
                 if (fabric.PatternBrush) {
+                    var texturePatternBrush;
+                    const img = new Image();
+                    img.src = "./mJIRnVw.png";
+                    img.onload = () => {
+                           texturePatternBrush  = new fabric.PatternBrush(canvas);
+                            texturePatternBrush.source = img;
+                            console.log("image loaded")
+                    };
                     var vLinePatternBrush = new fabric.PatternBrush(canvas);
                     vLinePatternBrush.getPatternSrc = function () {
 
@@ -210,11 +231,8 @@
                         return patternCanvas;
                     };
 
-                    var img = new Image();
-                    img.src = '../assets/honey_im_subtle.png';
-
-                    var texturePatternBrush = new fabric.PatternBrush(canvas);
-                    texturePatternBrush.source = img;
+                    
+                  
                 }
 
                 $('drawing-mode-selector').onchange = function () {
@@ -234,9 +252,14 @@
                     else if (this.value === 'texture') {
                         canvas.freeDrawingBrush = texturePatternBrush;
                     }
-                    else if (this.value === 'paint') {
-                       
+                    else if (this.value === 'paint') {  
                         canvas.freeDrawingBrush = new fabric.PaintBucket(canvas);
+                    }
+                    else if (this.value === 'eraser') {  
+                        canvas.freeDrawingBrush = new fabric.EraserBrush(canvas);
+                    }
+                    else if (this.value === 'frog') {  
+                        canvas.freeDrawingBrush = new fabric.ImageBrush(canvas,'./frog.jpg','./frog.mp3');
                     }
                     else {
                         canvas.freeDrawingBrush = new fabric[this.value + 'Brush'](canvas);
@@ -245,10 +268,12 @@
                     if (canvas.freeDrawingBrush) {
                         var brush = canvas.freeDrawingBrush;
                         brush.color = drawingColorEl.value;
-                        if (brush.getPatternSrc) {
+                        if (brush.getPatternSrc && this.value != 'texture') {
                             brush.source = brush.getPatternSrc.call(brush);
+                        }else{
+                            console.log("check")
                         }
-                        brush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
+                        brush.width = this.value == 'texture' ?  50 : (parseInt(drawingLineWidthEl.value, 10) || 1);
                         brush.shadow = new fabric.Shadow({
                             blur: parseInt(drawingShadowWidth.value, 10) || 0,
                             offsetX: 0,

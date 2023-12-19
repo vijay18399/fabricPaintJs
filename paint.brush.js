@@ -19,46 +19,18 @@
        * @default
        */
       type: 'paintBucket',
-  
+     hexToRgb: function (hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : null;
+      },
       initialize: function (canvas) {
         this.canvas = canvas;
         this.ctx = canvas.contextContainer;
-        this.floodFill = new FloodFill();
-        this.fill = this.fill.bind(this);
       },
-  
-      fill: function (color, x, y, tolerance) {
-        const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-        this.floodFill.init(imageData);
-        this.floodFill.fill(color, x, y, tolerance,  this.putImage.bind(this));
-      
-      },
-      putImage: function (imageData) {
-        console.log("Flood-fill algorithm completed.");
-        if (imageData) {
-          var _this = this; // Save reference to 'this'
-      
-          // Create a new Fabric.js Image object from the imageData
-          var img = new fabric.Image.fromURL('data:image/png;base64,' + btoa(String.fromCharCode.apply(null, imageData.data)), function (img) {
-            // Set the position and other properties as needed
-            img.set({
-              left: 0,
-              top: 0,
-              width: _this.canvas.width,
-              height: _this.canvas.height,
-              selectable: false, // Make it non-selectable if needed
-            });
-      
-            // Add the Image object to the canvas
-            _this.canvas.add(img);
-      
-            // Request render to reflect the changes on the canvas
-            _this.canvas.requestRenderAll();
-          });
-        }
-      },
-      
-      
       onMouseDown: function (pointer) {
         const options = {
           e: pointer,
@@ -78,16 +50,29 @@
       onMouseUp: function (event) {
         // this.callSuper('onMouseUp', event);
       },
-  
+      addImage : function(c,img){
+        img.left = 0;
+        img.top = 0;
+        this.canvas.add(img);
+        img.bringToFront();
+        c = null;
+        $('#_temp_canvas').remove();
+   
+        this.canvas.renderAll();
+      },
+      putImage: function (imageData) {
+        var c = document.createElement('canvas');
+        c.setAttribute('id', '_temp_canvas');
+        c.width = this.canvas.width;
+        c.height =  this.canvas.height;
+        c.getContext('2d').putImageData(imageData, 0, 0);
+        fabric.Image.fromURL(c.toDataURL(),this.addImage.bind(this,c));
+      },
+    
       paint: function (pointer) {
-        const fillTolerance = 0;
-        const fillColor = this.canvas.freeDrawingBrush.color;
-        const strokeColor = this.canvas.freeDrawingBrush.strokeColor;
-  
-        const mouseX = Math.round(pointer.x);
-        const mouseY = Math.round(pointer.y);
-  
-        this.fill(fillColor, mouseX, mouseY, fillTolerance);
+        var colorArray = this.hexToRgb(this.color);
+        console.log(colorArray)
+        draw_fill_without_pattern_support(1,this.canvas,this.ctx,pointer.x,pointer.y,colorArray.r, colorArray.g, colorArray.b, 255,this.putImage.bind(this))
       },
     });
   })(typeof exports !== 'undefined' ? exports : this);
