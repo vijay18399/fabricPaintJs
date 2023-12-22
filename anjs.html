@@ -1,0 +1,159 @@
+ <!DOCTYPE html>
+<html ng-app="myApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="./fabric.js"></script>
+    <script src="./filler.js"></script>
+    <script src="./history.js"></script>
+    <script src="./paint.brush.js"></script>
+    <script src="./image.brush.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <style>
+        .toolBtn.active, .colorBtn.active, .patternBtn.active {
+            border: #05b55f 2px solid;
+        }
+    </style>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+    <div class="toolBar">
+        <div class="title">Tools</div>
+        <div class="tools">
+            <div ng-class="{active: (tool == activeTool)}"  ng-repeat="tool in tools" class="toolBtn" ng-click="setActiveTool(tool)">
+                <span>{{tool.name}}</span>
+            </div>
+            <div ng-click="undo()"  class="toolBtn">
+                <span>Undo</span>
+            </div>
+            <div  ng-click="redo()" class="toolBtn">
+                <span>Redo</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="colorPallet">
+        <div class="title">Colors</div>
+        <div class="colors">
+            <div ng-class="{active: (color == activeColor)}" ng-repeat="color in colors" style='background-color: {{color}}' class="colorBtn" ng-click="setActiveColor(color)">
+            </div>
+        </div>
+    </div>
+
+    <div class="patternBar">
+        <div class="title">Patterns</div>
+        <div class="patterns">
+            <div  ng-class="{active: (pattern == activePattern)}" ng-repeat="pattern in activeTool.patterns" class="patternBtn" ng-click="setActivePattern(pattern)">
+                <span>{{pattern}}</span>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="fabricCanavs"></canvas>
+
+    <script>
+        var app = angular.module("myApp", []);
+    
+        app.controller("myCtrl", function ($scope) {
+            $scope.activeTool = null;
+            $scope.activePattern = null;
+            $scope.activeColor = "red"; // Set default color
+            $scope.colors = [
+    "#FF0000", // Red
+    "#00FF00", // Green
+    "#FFFF00", // Yellow
+    "#A52A2A", // Brown
+    "#FFC0CB", // Pink
+    "#FFFFFF", // White
+    "#000000", // Black
+    "#FFA500", // Orange
+    // Add more colors as needed
+];
+            $scope.tools = [
+                { name: "paint", patterns: ["circle", "square", "triangle"], defaultPattern: "circle" },
+                { name: "shapes", patterns: ["circle", "square", "triangle"], defaultPattern: "circle" },
+                { name: "stamps", patterns: ["apple", "ball", "car"], defaultPattern: "apple" },
+                { name: "lines", patterns: ["circle", "square", "triangle"], defaultPattern: "triangle" },
+                { name: "fill", patterns: []}
+                // Add more tools as needed
+            ];
+    
+            var canvas = new fabric.Canvas("fabricCanavs", {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                backgroundColor: "rgb(240, 242, 245)",
+            });
+            var lowerCanvas = canvas.lowerCanvasEl;
+
+// Set the dimensions of the lower canvas to match the upper canvas
+lowerCanvas.width = canvas.width;
+lowerCanvas.height = canvas.height;
+            console.log({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            })
+            $scope.handleTool = function () {
+                canvas.isDrawingMode = true;
+            // Use a switch statement to handle different tools based on the active pattern
+            switch ($scope.activeTool.name) {
+                case "paint":
+                    canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+                    break;
+                case "shapes":
+
+                    break;
+                case "stamps":
+                    break;
+                case "lines":
+
+                    break;
+                case "eraser":
+                     canvas.freeDrawingBrush = new fabric.EraserBrush(canvas);
+                    break;
+                case "fill":
+                     canvas.freeDrawingBrush = new fabric.PaintBucket(canvas);
+                    break;
+                // Add more cases for other patterns as needed
+                default:
+                    // Default case
+                    console.log("No matching pattern found");
+                    break;
+            }
+            canvas.freeDrawingBrush.color = $scope.activeColor;
+        };
+  
+            $scope.setActiveTool = function (tool) {
+                $scope.activeTool = tool;
+                $scope.activePattern = tool.defaultPattern; // Set default pattern for the selected tool
+                // Implement logic to change tool behavior or perform other actions based on the selected tool
+                console.log("Selected Tool:", tool.name);
+                $scope.handleTool()
+            };
+           $scope.setActiveColor  = function (color) {
+               $scope.activeColor = color;
+               canvas.freeDrawingBrush.color = color;
+           }
+            $scope.setActivePattern = function (pattern) {
+                $scope.activePattern = pattern;
+                // Implement logic to change pattern behavior or perform other actions based on the selected pattern
+                console.log("Selected Pattern:", pattern);
+                $scope.handleTool()
+            };
+            $scope.undo = function () { canvas.undo() };
+            $scope.redo = function () { canvas.redo() };
+
+            // Set default tool and pattern
+            $scope.setActiveTool($scope.tools[0]); // Set the default tool (e.g., Paint)
+            $scope.setActiveColor($scope.colors[0]);
+                });
+          
+    </script>
+    
+</body>
+
+</html>

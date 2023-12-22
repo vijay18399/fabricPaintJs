@@ -108,19 +108,19 @@
             
                 var canvas = this.__canvas = new fabric.Canvas('c', {
                     isDrawingMode: true,
-                    width:window.innerWidth-10,
-                    height:window.innerHeight-10
+                    width:window.innerWidth-400,
+                    height:window.innerHeight-100
                 });
 
                 fabric.Object.prototype.transparentCorners = false;
-                fabric.Image.fromURL('https://www.shutterstock.com/image-vector/cute-funny-coloring-page-rocket-600nw-1893601582.jpg', function(img) {
-                    img.set({
-                        left: 0,
-                        top: 0,
-                    });
-                    canvas.add(img);
-                    canvas.renderAll();
-                    },{crossOrigin: 'anonymous'});
+                // fabric.Image.fromURL('https://www.shutterstock.com/image-vector/cute-funny-coloring-page-rocket-600nw-1893601582.jpg', function(img) {
+                //     img.set({
+                //         left: 0,
+                //         top: 0,
+                //     });
+                //     canvas.add(img);
+                //     canvas.renderAll();
+                //     },{crossOrigin: 'anonymous'});
                 var drawingModeEl = $('drawing-mode'),
                     drawingOptionsEl = $('drawing-mode-options'),
                     drawingColorEl = $('drawing-color'),
