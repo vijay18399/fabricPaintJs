@@ -8,10 +8,13 @@
 
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="./fabric.js"></script>
+    <script src="https://unpkg.com/fabric@latest/src/mixins/eraser_brush.mixin.js"></script>
     <script src="./filler.js"></script>
     <script src="./history.js"></script>
     <script src="./paint.brush.js"></script>
     <script src="./image.brush.js"></script>
+    <script src="./shape.brush.js"></script>
+    <script src="./pattern.brush.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
     <style>
         .toolBtn.active, .colorBtn.active, .patternBtn.active {
@@ -58,7 +61,21 @@
 
     <script>
         var app = angular.module("myApp", []);
-    
+        function addImage(canvas){
+  var imgURL = 'https://t3.ftcdn.net/jpg/05/74/59/94/360_F_574599444_KdhVklOr3PTUyMlq7079mbrFXyB0lFXf.jpg';
+// Create a Fabric.js image object
+fabric.Image.fromURL(imgURL, function(img) {
+    // Set the scale of the image to fit the canvas width and height
+    img.scaleToWidth(canvas.width);
+    img.scaleToHeight(canvas.height);
+
+    // Add the image to the canvas
+    canvas.add(img);
+
+    // Render the canvas
+    canvas.renderAll();
+},{crossOrigin: 'anonymous'});
+}
         app.controller("myCtrl", function ($scope) {
             $scope.activeTool = null;
             $scope.activePattern = null;
@@ -76,10 +93,13 @@
 ];
             $scope.tools = [
                 { name: "paint", patterns: ["circle", "square", "triangle"], defaultPattern: "circle" },
-                { name: "shapes", patterns: ["circle", "square", "triangle"], defaultPattern: "circle" },
-                { name: "stamps", patterns: ["apple", "ball", "car"], defaultPattern: "apple" },
-                { name: "lines", patterns: ["circle", "square", "triangle"], defaultPattern: "triangle" },
-                { name: "fill", patterns: []}
+                { name: "shapes", patterns: ["circle", "square", "ellipse"  ,"triangle","pentagon","rhombus","octagon"], defaultPattern: "circle" },
+                { name: "stamps", patterns: ["frog"], defaultPattern: "frog" },
+                { name: "lines", patterns: ["circle"], defaultPattern: "circle" },
+                { name: "fill", patterns: []},
+                { name: "eraser", patterns: []},
+                { name: "select", patterns: []},
+                { name: "pattern", patterns: []}
                 // Add more tools as needed
             ];
     
@@ -88,6 +108,7 @@
                 height: window.innerHeight,
                 backgroundColor: "rgb(240, 242, 245)",
             });
+            addImage(canvas)
             var lowerCanvas = canvas.lowerCanvasEl;
 
 // Set the dimensions of the lower canvas to match the upper canvas
@@ -105,12 +126,15 @@ lowerCanvas.height = canvas.height;
                     canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
                     break;
                 case "shapes":
-
+                    canvas.freeDrawingBrush = new fabric.ShapeBrush(canvas);
+                    canvas.freeDrawingBrush.setShape($scope.activePattern)
                     break;
                 case "stamps":
+                    canvas.freeDrawingBrush = new fabric.ImageBrush(canvas,`./frog.jpg`,`./frog.mp3`);
                     break;
                 case "lines":
-
+                    canvas.freeDrawingBrush = new fabric.ShapeBrush(canvas);
+                    canvas.freeDrawingBrush.setShape("line")
                     break;
                 case "eraser":
                      canvas.freeDrawingBrush = new fabric.EraserBrush(canvas);
@@ -118,10 +142,14 @@ lowerCanvas.height = canvas.height;
                 case "fill":
                      canvas.freeDrawingBrush = new fabric.PaintBucket(canvas);
                     break;
+                case "pattern":
+                    canvas.freeDrawingBrush = new fabric.CustomPatternBrush(canvas);
+                    break;
                 // Add more cases for other patterns as needed
                 default:
                     // Default case
                     console.log("No matching pattern found");
+                    canvas.isDrawingMode = false;
                     break;
             }
             canvas.freeDrawingBrush.color = $scope.activeColor;
