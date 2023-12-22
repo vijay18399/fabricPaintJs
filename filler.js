@@ -14,6 +14,10 @@ function draw_fill_without_pattern_support(fill_threshold,main_canvas,ctx, start
 
 	const c_width = main_canvas.width;
 	const c_height = main_canvas.height;
+	console.log({
+		width: c_width,
+		height: c_height,
+	})
 	start_x = Math.max(0, Math.min(Math.floor(start_x), c_width));
 	start_y = Math.max(0, Math.min(Math.floor(start_y), c_height));
 	const stack = [[start_x, start_y]];

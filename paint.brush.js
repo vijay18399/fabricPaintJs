@@ -28,8 +28,9 @@
         } : null;
       },
       initialize: function (canvas) {
-        this.canvas = canvas;
-        this.ctx = canvas.contextContainer;
+        this.maincanvas = canvas;
+        this.canvas = this.maincanvas.lowerCanvasEl;
+        this.ctx = this.canvas.getContext('2d');
       },
       onMouseDown: function (pointer) {
         const options = {
@@ -50,29 +51,37 @@
       onMouseUp: function (event) {
         // this.callSuper('onMouseUp', event);
       },
-      addImage : function(c,img){
-        img.left = 0;
-        img.top = 0;
-        this.canvas.add(img);
-        img.bringToFront();
-        c = null;
+      addImage : function(img){
+        img.set({
+            left : 0,
+            top : 0,
+            width :this.imageData.width,
+            height :this.imageData.height,
+        })
+        this.maincanvas.add(img);
         $('#_temp_canvas').remove();
-   
-        this.canvas.renderAll();
+        this.maincanvas.renderAll();
       },
       putImage: function (imageData) {
+        this.imageData = imageData;
         var c = document.createElement('canvas');
         c.setAttribute('id', '_temp_canvas');
-        c.width = this.canvas.width;
-        c.height =  this.canvas.height;
-        c.getContext('2d').putImageData(imageData, 0, 0);
-        fabric.Image.fromURL(c.toDataURL(),this.addImage.bind(this,c));
+        c.width = imageData.width;
+        c.height =  imageData.height;
+        c.getContext('2d').putImageData(imageData, 0, 0,0,0,imageData.width,imageData.height);
+        fabric.Image.fromURL(c.toDataURL(),this.addImage.bind(this));
+        // this.download(c.toDataURL(),"a.png")
       },
-    
+      download: function(dataurl, filename) {
+        const link = document.createElement("a");
+        link.href = dataurl;
+        link.download = filename;
+        link.click();
+      },
       paint: function (pointer) {
         var colorArray = this.hexToRgb(this.color);
         console.log(colorArray)
-        draw_fill_without_pattern_support(1,this.canvas,this.ctx,pointer.x,pointer.y,colorArray.r, colorArray.g, colorArray.b, 255,this.putImage.bind(this))
+        draw_fill_without_pattern_support(20,this.canvas,this.ctx,pointer.x,pointer.y,colorArray.r, colorArray.g, colorArray.b, 255,this.putImage.bind(this))
       },
     });
   })(typeof exports !== 'undefined' ? exports : this);
