@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>How to filter using fabric.js</title>
+   <script
+src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/510/fabric.min.js">
+   </script>
+<style>
+body {
+    display: grid;
+    grid-template-rows: auto;
+    justify-items: center;
+    align-items: center;
+}
+</style>
+</head>
+<body>
+   <h1>How to do image filters with FabricJS</h2>
+   <h3> Original image </h3>
+    <div id="img_home"></div>
+<!--
+   <h3> Second  image </h3>
+    <canvas id="sec_canvas"></canvas>
+-->
+  <hr/>
+ <h2> Please choose the filter </h2>
+ <select onchange="runFilter()" id="filter-option">
+ <option>None</option>
+ <option>Polaroid</option>
+ <option>Sepia</option>
+ <option>Kodachrome</option>
+ <option>Contrast</option>
+ <option>Brightness</option>
+ <option>Greyscale</option>
+ <option>Brownie</option>
+ <option>Vintage</option>
+ <option>Technicolor</option>
+ <option>Pixelate</option>
+ <option>Invert</option>
+ <option>Blur</option>
+ <option>Sharpen</option>
+ <option>Emboss</option>
+ <option>RemoveColor</option>
+ <option>BlacknWhite</option>
+ <option>Vibrance</option>
+ <option>BlendColor</option>
+ <option>BlendImage</option>
+ <option>HueRotate</option>
+ <option>Resize</option>
+ <option>Saturation</option>
+ <option>Gamma</option>
+ </select>
+   <h3> After image filter </h3>
+   <div id='container'>
+    <canvas id="canvas" ></canvas>
+   </div>
+ 
+   <script>
+function runFilter() {
+    var filter = document.getElementById("filter-option").value;
+    chooseFilter(filter);
+    /* Now apply */
+    img.applyFilters();
+    canvas.add(img);
+}
+chooseFilter = (filter) => {
+    switch (filter) {
+        case 'Polaroid':
+            /* Polaroid effect */
+            var pl = new fabric.Image.filters.Polaroid();
+            img.filters.push(pl);
+            return;
+        case 'Sepia':
+            /* Sepia effect */
+            var sp = new fabric.Image.filters.Sepia();
+            img.filters.push(sp);
+            return;
+        case 'Kodachrome':
+            /* Kodachrome effect */
+            var kd = new fabric.Image.filters.Kodachrome();
+            img.filters.push(kd);
+            return;
+        case 'Contrast':
+            /* Contrast filter */
+            var contrast = new fabric.Image.filters.Contrast({
+                contrast: 0.3
+            });
+            img.filters.push(contrast);
+            return;
+        case 'Brightness':
+            /* Brightness filter */
+            var brightness = new fabric.Image.filters.Brightness({
+                brightness: 0.8
+            });
+            img.filters.push(brightness);
+            return;
+
+        case 'Greyscale':
+            /* Greyscale */
+            var gs = new fabric.Image.filters.Grayscale();
+            img.filters.push(gs);
+            return;
+        case 'Brownie':
+            /* Brownie */
+            var br = new fabric.Image.filters.Brownie();
+            img.filters.push(br);
+            return;
+        case 'Vintage':
+            /* Vintage */
+            var vn = new fabric.Image.filters.Vintage();
+            img.filters.push(vn);
+            return;
+        case 'Technicolor':
+            /* Technicolor */
+            var tc = new fabric.Image.filters.Technicolor();
+            img.filters.push(tc);
+            return;
+        case 'Pixelate':
+            /* Pixelate */
+            var px = new fabric.Image.filters.Pixelate();
+            img.filters.push(px);
+            return;
+
+        case 'Invert':
+            /* Invert */
+            var inv = new fabric.Image.filters.Invert();
+            img.filters.push(inv);
+            return;
+        case 'Blur':
+            /* Blur */
+            var blr = new fabric.Image.filters.Blur();
+            img.filters.push(blr);
+            return;
+        case 'Sharpen':
+            /* Sharpen */
+            var sharpen = new fabric.Image.filters.Convolute({
+                matrix: [0, -1, 0,
+                    -1, 5, -1,
+                    0, -1, 0
+                ]
+            });
+            img.filters.push(sharpen);
+            return;
+        case 'Emboss':
+            /* Emboss */
+            var emb = new fabric.Image.filters.Convolute({
+                matrix: [1, 1, 1,
+                    1, 0.7, -1,
+                    -1, -1, -1
+                ]
+            });
+            img.filters.push(emb);
+            return;
+
+        case 'RemoveColor':
+            /* Remove color */
+            var rm = new fabric.Image.filters.RemoveColor({
+                threshold: 0.2,
+                distance: 0.5
+            });
+            img.filters.push(rm);
+            return;
+        case 'BlacknWhite':
+            /* Black and White */
+            var bw = new fabric.Image.filters.BlackWhite();
+            img.filters.push(bw);
+            return;
+        case 'Vibrance':
+            /* Vibrance filter */
+            var vb = new fabric.Image.filters.Vibrance({
+                vibrance: 1
+            });
+            img.filters.push(vb);
+            return;
+
+        case 'BlendColor':
+            /* Blend color */
+            var blcol = new fabric.Image.filters.BlendColor({
+                color: '#00ff00',
+                mode: 'multiply'
+            });
+            img.filters.push(blcol);
+            return;
+        case 'BlendImage':
+            /* Blend image */
+            var blimg = new fabric.Image.filters.BlendImage({
+                image: secImg,
+                mode: 'multiply',
+                alpha: 0.2
+            });
+            img.filters.push(blimg);
+            return;
+
+        case 'HueRotate':
+            /* Hue rotate */
+            var huerot = new fabric.Image.filters.HueRotation({
+                rotation: 0.5
+            });
+            img.filters.push(huerot);
+            return;
+        case 'Resize':
+            /* Resize */
+            var resz = new fabric.Image.filters.Resize();
+            img.filters.push(resz);
+            return;
+        case 'Saturation':
+            /* Saturation */
+            var sat = new fabric.Image.filters.Saturation({
+                saturation: 0.7
+            });
+            img.filters.push(sat);
+            return;
+        case 'Gamma':
+            /* Gamma filter */
+            var gamma = new fabric.Image.filters.Gamma({
+                gamma: [1, 0.5, 2.1]
+            });
+            img.filters.push(gamma);
+            return;
+        default:
+            alert("Filter not implemented");
+    }
+
+};
+var secImg, img;
+// init fabric canvas
+var canvas = new fabric.Canvas('canvas', {
+    isDrawingMode: false,
+    selection: false
+});
+canvas.enableGLFiltering = false;
+canvas.setDimensions({
+    width: 800,
+    height: 600
+});
+fabric.Image.fromURL('https://source.unsplash.com/featured/800x600',
+    function(myImg) {
+        img = myImg.set({
+            left: 0,
+            top: 0
+        });
+        canvas.add(img);
+        var im = new Image();
+        im.src = canvas.toDataURL("image/png");
+        console.log(im);
+        img_home.appendChild(im);
+
+    }, {
+        crossOrigin: 'anonymous'
+    });
+
+/*
+var sec_canvas = new fabric.Canvas('sec_canvas', {
+    isDrawingMode: false,
+    selection: false
+});
+sec_canvas.setDimensions({
+    width: 800,
+    height: 600
+});
+
+fabric.Image.fromURL('https://source.unsplash.com/featured/500x300', function(secimg) {
+    secImg = secimg;
+    sec_canvas.add(secimg);
+}, {
+    crossOrigin: 'annonymous'
+});
+*/
+   </script>
+</body>
+</html>
