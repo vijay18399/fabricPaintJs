@@ -1,0 +1,16 @@
+<!-- toolbar.html -->
+<div class="toolBar">
+    <div class="card-panel">
+        <span class="blue-text text-darken-2">Tools</span>
+      </div>
+   
+      <div class="tools">
+        <a   ng-repeat="tool in tools"   data-tooltip="{{tool.name}}" data-position="bottom" ng-class="{active: (tool == activeTool)}"  
+        ng-click="setTool(tool)" class="card-panel tooltipped toolBtn"><i class="material-icons">{{tool.icon}}</i></a>
+        <a   ng-click="download()"   data-tooltip="Download as Image"  data-position="bottom" class="card-panel tooltipped toolBtn"><i class="material-icons">download</i></a>
+
+        <a   ng-click="undo()"    data-tooltip="Undo" data-position="bottom" class="card-panel tooltipped toolBtn"><i class="material-icons">undo</i></a>
+        <a   ng-click="redo()"   data-tooltip="Redo"  data-position="bottom" class="card-panel tooltipped toolBtn"><i class="material-icons">redo</i></a>
+        </div>
+    </div>
+</div>

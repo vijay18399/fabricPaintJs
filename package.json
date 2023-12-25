@@ -1,0 +1,30 @@
+{
+  "name": "tux",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babelify": "^10.0.0",
+    "browserify": "^17.0.0",
+    "gulp": "^4.0.2",
+    "gulp-bower-files": "^0.2.7",
+    "gulp-concat": "^2.6.1",
+    "gulp-connect": "^5.7.0",
+    "gulp-copy": "^4.0.1",
+    "gulp-filter": "^9.0.1",
+    "gulp-sass": "^5.1.0",
+    "gulp-uglify": "^3.0.2",
+    "main-bower-files": "^2.13.3",
+    "sass": "^1.69.5",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "dependencies": {
+    "fabric": "^5.3.0",
+    "materialize-css": "^1.0.0"
+  }
+}

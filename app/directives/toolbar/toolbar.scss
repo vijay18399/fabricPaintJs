@@ -1,0 +1,27 @@
+.toolBar {
+    display: flex;
+    flex-direction: column;
+    width: 135px;
+    padding: 5px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    .tools{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0px;
+        justify-content: space-around;
+        .toolBtn{
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            &.active {
+                background-color: #1a202c;
+            }
+        }
+  
+    }
+  }

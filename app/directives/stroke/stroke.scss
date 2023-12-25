@@ -1,0 +1,13 @@
+.strokeBar {
+    width: 180px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+    padding: 5px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 99;
+  }

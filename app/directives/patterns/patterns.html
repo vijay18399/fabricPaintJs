@@ -1,0 +1,11 @@
+<div ng-if="activeTool.subCategory.length" class="patternBar">
+    <div class="card-panel">
+        <span class="blue-text text-darken-2">{{subName}}</span>
+     </div>
+    <div class="patterns">
+        <div ng-class="{active: (pattern == activePattern)}" ng-repeat="pattern in activeTool.subCategory"
+            class="patternBtn card-panel" ng-click="setPattern(pattern)">
+            <img>{{pattern}}</img>
+        </div>
+    </div>
+</div>

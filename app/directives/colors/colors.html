@@ -1,0 +1,10 @@
+<div class="colorPallet">
+    <div class="card-panel">
+        <span class="blue-text text-darken-2">Colors</span>
+     </div>
+    <div class="colors">
+        <div ng-class="{active: (color == activeColor)}" ng-repeat="color in colors"
+            style="background-color: {{color}}" class="colorBtn card-panel" ng-click="setActiveColor(color)">
+        </div>
+    </div>
+</div>

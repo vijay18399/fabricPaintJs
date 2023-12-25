@@ -1,0 +1,24 @@
+.patternBar {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  padding: 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 99;
+
+  .patterns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    .patternBtn {
+      width: 44%;
+        &.active {
+          border: #05b55f 2px solid;
+        }
+    }
+
+  }
+}
