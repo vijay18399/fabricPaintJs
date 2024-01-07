@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bokeh Effect</title>
+</head>
+<body>
+    <canvas id="bokehCanvas" width="500" height="500" style="border: 1px solid #000;"></canvas>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var canvas = document.getElementById('bokehCanvas');
+            var ctx = canvas.getContext('2d');
+
+            // Load your image
+            var image = new Image();
+            image.src = 'assets/x.jpg';
+
+            image.onload = function () {
+                // Draw the image on the canvas
+                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                // Add bokeh effect at a specific point (e.g., mouse down)
+                canvas.addEventListener('mousedown', function (event) {
+                    addBokehEffect(ctx, event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+                });
+            };
+
+            // Function to add bokeh effect at a specific point
+            function addBokehEffect(context, x, y) {
+                console.log(x,y)
+                // Set the blur radius and other parameters
+                var blurRadius = 20;
+                var gradient = context.createRadialGradient(x, y, 0, x, y, blurRadius);
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                // Apply the bokeh effect
+                context.fillStyle = gradient;
+                context.beginPath();
+                context.arc(x, y, blurRadius, 0, 2 * Math.PI);
+                context.fill();
+            }
+        });
+    </script>
+</body>
+</html>

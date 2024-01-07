@@ -41,7 +41,7 @@ COLORS = [
   ];
   
 TOOLS = [
-    { name: "paint", icon : "brush", subName: 'Brushes',  subCategory: ['Pencil', 'Crayon','Ink','Marker','Fur','Longfur','Ribbon','Shaded','Sketchy','Spraypaint','Squares','Web'], defaultPattern: "Pencil"},
+    { name: "paint", icon : "brush", subName: 'Brushes',  subCategory: ['Pencil', 'Crayon','Ink','Marker','Fur','Longfur','Ribbon','Shaded','Sketchy','Spraypaint','Squares','Web','CustomPattern','SequencePattern','PatternLine','MagicFilter'], defaultPattern: "Smudge"},
     { name: "shapes",icon : "panorama_fish_eye", subName: 'Shapes', subCategory: ["circle", "square", "ellipse"], defaultPattern: "circle" },
     { name: "stamps", icon : "crop_original", subName: 'Stamps',  subCategory: ["frog","dog","lion","parrot","pegion","shark","turtle"], defaultPattern: "frog" },
     { name: "fill", icon : "format_color_fill",  subCategory: [] },
@@ -1402,101 +1402,6 @@ fabric.Canvas.prototype.initialize = (function (originalFn) {
   fabric.Canvas.prototype.offHistory = function () {
     this.historyProcessing = true;
   };
-app.controller('WhiteboardController', function ($scope) {
-    var canvas;
-    $scope.activeTool = null;
-    $scope.activePattern = null;
-    $scope.activeColor = "red";
-    $scope.stroke;
-    $scope.colors = COLORS;
-    $scope.tools = TOOLS;
-    $scope.setActiveTool = function(tool) {
-        $scope.activeTool = tool;
-        $scope.activePattern = tool.defaultPattern; 
-        $scope.subName = tool.subName
-        console.log("Selected Tool:", tool.name);
-        $scope.handleTool()
-    };
-    $scope.init = function () {
-        canvas = new fabric.Canvas("fabricCanavs", {
-            width: window.innerWidth,
-            height: window.innerHeight,
-            // backgroundColor: "rgb(240, 242, 245)",
-        });
-        var lowerCanvas = canvas.lowerCanvasEl;
-        lowerCanvas.width = canvas.width;
-        lowerCanvas.height = canvas.height;
-    }
-    $scope.init();
-    $scope.handleTool = function () {
-        canvas.isDrawingMode = true;
-        switch ($scope.activeTool.name) {
-            case "paint":
-                $scope.handleBrush()
-                break;
-            case "shapes":
-                canvas.freeDrawingBrush = new fabric.ShapeBrush(canvas);
-                canvas.freeDrawingBrush.setShape($scope.activePattern)
-                break;
-            case "stamps":
-                canvas.freeDrawingBrush = new fabric.ImageBrush(canvas, $scope.activePattern, );
-                break;
-            case "lines":
-                canvas.freeDrawingBrush = new fabric.ShapeBrush(canvas);
-                canvas.freeDrawingBrush.setShape("line")
-                break;
-            case "eraser":
-                canvas.freeDrawingBrush = new fabric.EraserBrush(canvas);
-                break;
-            case "fill":
-                canvas.freeDrawingBrush = new fabric.PaintBucket(canvas);
-                break;
-            default:
-                // Default case
-                console.log("No matching pattern found");
-                canvas.isDrawingMode = false;
-                break;
-        }
-        canvas.freeDrawingBrush.color = $scope.activeColor;
-    };
-   
-    $scope.handleBrush= function(){
-        canvas.freeDrawingBrush =  new fabric[$scope.activePattern + 'Brush'](canvas);
-
-    }
-    $scope.setActiveColor = function (color) {
-        $scope.activeColor = color;
-        canvas.freeDrawingBrush.color = color;
-    }
-    $scope.setActivePattern = function (pattern) {
-        $scope.activePattern = pattern;
-        console.log("Selected Pattern:", pattern);
-        $scope.handleTool();
-    };
-    $scope.setActiveStroke= function (stroke) {
-        $scope.stroke  = stroke;
-        canvas.freeDrawingBrush.width = stroke;
-    }
-    $scope.undo = function () {
-        canvas.undo()
-    };
-    $scope.redo = function () {
-        canvas.redo()
-    };
-    $scope.download  = function () {
-        var dataURL = canvas.toDataURL({
-            format: 'png',
-            quality: 1.0
-        });
-        var a = document.createElement('a');
-        a.href = dataURL;
-        a.download = `${(new Date()).toISOString()}.png`;
-        a.click();
-    };
-    $scope.setActiveTool($scope.tools[0]); 
-    $scope.setActiveColor($scope.colors[0]);
-    $scope.setActiveStroke(5);
-});
 // app/directives/colors.directive.js
 app.directive('colors', function () {
     return {
@@ -1566,6 +1471,180 @@ app.directive('toolbar', function () {
                 scope.tool_change({'tool' : tool});
             } 
       }
+    }
+});
+
+app.controller('WhiteboardController', function ($scope) {
+    var canvas;
+    $scope.activeTool = null;
+    $scope.activePattern = null;
+    $scope.activeColor = "red";
+    $scope.stroke;
+    $scope.colors = COLORS;
+    $scope.tools = TOOLS;
+    $scope.setActiveTool = function(tool) {
+        $scope.activeTool = tool;
+        $scope.activePattern = tool.defaultPattern; 
+        $scope.subName = tool.subName
+        console.log("Selected Tool:", tool.name);
+        $scope.handleTool()
+    };
+    $scope.init = function () {
+        canvas = new fabric.Canvas("fabricCanavs", {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            // backgroundColor: "rgb(240, 242, 245)",
+        });
+        var lowerCanvas = canvas.lowerCanvasEl;
+        lowerCanvas.width = canvas.width;
+        lowerCanvas.height = canvas.height;
+        fabric.Image.fromURL('assets/bg.jpg', function (img) {
+            img.set({
+                left: 0,
+                top: 0,
+                selectable: false, // Make the background image non-selectable
+                evented: false, // Make the background image non-evented
+            });
+        
+            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+        });
+    }
+
+    $scope.init();
+    $scope.handleTool = function () {
+        canvas.isDrawingMode = true;
+        switch ($scope.activeTool.name) {
+            case "paint":
+                $scope.handleBrush()
+                break;
+            case "shapes":
+                canvas.freeDrawingBrush = new fabric.ShapeBrush(canvas);
+                canvas.freeDrawingBrush.setShape($scope.activePattern)
+                break;
+            case "stamps":
+                canvas.freeDrawingBrush = new fabric.ImageBrush(canvas, $scope.activePattern, );
+                break;
+            case "lines":
+                canvas.freeDrawingBrush = new fabric.ShapeBrush(canvas);
+                canvas.freeDrawingBrush.setShape("line")
+                break;
+            case "eraser":
+                canvas.freeDrawingBrush = new fabric.EraserBrush(canvas);
+                break;
+            case "fill":
+                canvas.freeDrawingBrush = new fabric.PaintBucket(canvas);
+                break;
+            default:
+                // Default case
+                console.log("No matching pattern found");
+                canvas.isDrawingMode = false;
+                break;
+        }
+        canvas.freeDrawingBrush.color = $scope.activeColor;
+    };
+   
+    $scope.handleBrush= function(){
+        canvas.freeDrawingBrush =  new fabric[$scope.activePattern + 'Brush'](canvas);
+    }
+    $scope.setActiveColor = function (color) {
+        $scope.activeColor = color;
+        canvas.freeDrawingBrush.color = color;
+    }
+    $scope.setActivePattern = function (pattern) {
+        $scope.activePattern = pattern;
+        console.log("Selected Pattern:", pattern);
+        $scope.handleTool();
+    };
+    $scope.setActiveStroke= function (stroke) {
+        $scope.stroke  = stroke;
+        canvas.freeDrawingBrush.width = stroke;
+    }
+    $scope.undo = function () {
+        canvas.undo()
+    };
+    $scope.redo = function () {
+        canvas.redo()
+    };
+    $scope.download  = function () {
+        var dataURL = canvas.toDataURL({
+            format: 'png',
+            quality: 1.0
+        });
+        var a = document.createElement('a');
+        a.href = dataURL;
+        a.download = `${(new Date()).toISOString()}.png`;
+        a.click();
+    };
+    $scope.setActiveTool($scope.tools[0]); 
+    $scope.setActiveColor($scope.colors[0]);
+    $scope.setActiveStroke(5);
+});
+fabric.MagicFilterBrush = fabric.util.createClass(fabric.PencilBrush, {
+    type: 'MagicFilterBrush',
+    initialize: function (canvas) {
+        this.canvas = canvas.upperCanvasEl;
+        this.ctx = this.canvas.getContext("2d");
+        this.mainCanvas = canvas;
+        this.filter = "invert";
+    },
+    onMouseDown: function (pointer, options) {
+        this.startPointer = pointer;
+        this.applyFilter(pointer.x, pointer.y);
+    },
+    onMouseMove: function (pointer, options) {
+        this.applyFilter(pointer.x, pointer.y);
+    },
+    onMouseUp: function (pointer) {
+        this.applyFilter(pointer.x, pointer.y);
+        var imageDataUrl = this.mainCanvas.upperCanvasEl.toDataURL('image/png');
+        fabric.Image.fromURL(imageDataUrl, (img) => {
+            img.set({
+                left: 0,
+                top: 0,
+                selectable: false
+            });
+            this.mainCanvas.add(img);
+        });
+    },
+    applyFilter: function (x, y) {
+        switch (this.filter) {
+            case "blur":
+                this.applyFilterAndDraw("blur(5px)", x, y);
+                break;
+            case "grayscale":
+                this.applyFilterAndDraw("grayscale(100%)", x, y);
+                break;
+            case "sepia":
+                this.applyFilterAndDraw("sepia(100%)", x, y);
+                break;
+            case "invert":
+                this.applyFilterAndDraw("invert(100%)", x, y);
+                break;
+            case "hueRotate":
+                this.applyFilterAndDraw("hue-rotate(90deg)", x, y);
+                break;
+        }
+    },
+    applyFilterAndDraw: function (filter, x, y) {
+        var tempCanvas = document.createElement('canvas');
+        tempCanvas.width = this.canvas.width;
+        tempCanvas.height = this.canvas.height;
+        var tempCtx = tempCanvas.getContext("2d");
+
+        tempCtx.drawImage(this.canvas, 0, 0);
+
+        tempCtx.filter = filter;
+        this.setArc(tempCtx, x, y);
+
+        this.ctx.drawImage(tempCanvas, 0, 0);
+
+        tempCtx.filter = "none"; // Reset the filter for subsequent drawings
+    },
+    setArc: function (context, x, y) {
+        context.beginPath();
+        context.arc(x, y, 5, 0, 2 * Math.PI);
+        context.fill();
+        context.closePath();
     }
 });
 
@@ -1731,6 +1810,212 @@ app.directive('toolbar', function () {
     });
   })(typeof exports !== 'undefined' ? exports : this);
   
+fabric.CustomPatternBrush = fabric.util.createClass(fabric.PencilBrush, {
+    type: 'CustomPatternBrush',
+    initialize: function (canvas) {
+        this.canvas = canvas.upperCanvasEl;
+        this.ctx = this.canvas.getContext("2d");
+        this.mainCanvas = canvas;
+        this.patternImage = new Image();
+        this.patternImage.src = 'assets/images/flower2.png';
+        this.patternWidth = 30; // Assuming image size is 30x30
+        this.patternHeight = 30;
+        this.gap = 30; // Gap between pattern images
+        this.lastDrawnPointer = null;
+    },
+    onMouseDown: function (pointer, options) {
+        this.startPointer = pointer;
+        this.drawPatternImage(pointer.x, pointer.y);
+    },
+    onMouseMove: function (pointer, options) {
+        if (this.lastDrawnPointer) {
+            var distance = this.calculateDistance(this.lastDrawnPointer, pointer);
+            if (distance >= this.gap) {
+                this.drawPatternImage(pointer.x, pointer.y);
+                this.lastDrawnPointer = pointer;
+            }
+        } else {
+            this.drawPatternImage(pointer.x, pointer.y);
+            this.lastDrawnPointer = pointer;
+        }
+    },
+    onMouseUp: function (pointer) {
+        var imageDataUrl = this.mainCanvas.upperCanvasEl.toDataURL('image/png');
+
+        fabric.Image.fromURL(imageDataUrl, (img) => {
+            img.set({
+                left: 0,
+                top: 0,
+                selectable: false
+            });
+            this.mainCanvas.add(img);
+        });
+
+        // Reset lastDrawnPointer on mouse up
+        this.lastDrawnPointer = null;
+    },
+    drawPatternImage: function (x, y) {
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.ctx.drawImage(this.patternImage, -15, -15, this.patternWidth, this.patternHeight);
+        this.ctx.restore();
+    },
+    calculateDistance: function (point1, point2) {
+        var deltaX = point2.x - point1.x;
+        var deltaY = point2.y - point1.y;
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
+});
+
+
+fabric.PatternLineBrush = fabric.util.createClass(fabric.BaseBrush, {
+    type: 'PatternLineBrush',
+    initialize: function (canvas) {
+        this.canvas = canvas.upperCanvasEl;
+        this.ctx = this.canvas.getContext("2d");
+        this.mainCanvas = canvas
+        this.patternImage = new Image();
+        this.patternImage.src = 'assets/images/flower2.png';
+        this.gap = 30; // Gap between images (30 for image size + 4 for space)
+    },
+    onMouseDown: function (pointer) {
+        this.startPointer = pointer;
+        this.isDrawing = true;
+
+        // Draw an initial image at the starting point
+        this.drawPatternImage(pointer.x, pointer.y, 0);
+    },
+    onMouseMove: function (pointer, options) {
+        if (this.isDrawing) {
+            this.drawLine(pointer);
+        }
+    },
+    onMouseUp: function () {
+        this.isDrawing = false;
+        // Convert canvas drawing to image and add it as Fabric Image
+        var imageDataUrl = this.mainCanvas.upperCanvasEl.toDataURL('image/png');
+        
+        fabric.Image.fromURL(imageDataUrl, (img) => {
+            img.set({
+                left: 0,
+                top: 0,
+                selectable: false
+            });
+            this.mainCanvas.add(img);
+        });
+    },
+    clearUpperCanvas: function () {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+    drawLine: function (pointer) {
+        this.clearUpperCanvas();
+        var distance = this.calculateDistance(this.startPointer, pointer);
+        console.log(distance)
+        var numImages = Math.round(distance / this.gap);
+        if(numImages<0){
+            numImages=1;
+        }
+        if (numImages > 0) {
+            var angle = this.calculateAngle(this.startPointer, pointer);
+            var deltaX = (pointer.x - this.startPointer.x) / numImages;
+            var deltaY = (pointer.y - this.startPointer.y) / numImages;
+
+            for (var i = 1; i <= numImages; i++) {
+                var x = this.startPointer.x + i * deltaX;
+                var y = this.startPointer.y + i * deltaY;
+                this.drawPatternImage(x, y, angle);
+            }
+        }
+    },
+    drawPatternImage: function (x, y, angle) {
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.ctx.rotate(angle);
+        this.ctx.drawImage(this.patternImage, -15, -15, 30, 30); // Assuming image size is 30x30
+        this.ctx.restore();
+    },
+    calculateDistance: function (point1, point2) {
+        var deltaX = point2.x - point1.x;
+        var deltaY = point2.y - point1.y;
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    },
+    calculateAngle: function (startPoint, endPoint) {
+        var deltaX = endPoint.x - startPoint.x;
+        var deltaY = endPoint.y - startPoint.y;
+        return Math.atan2(deltaY, deltaX);
+    }
+});
+
+
+fabric.SequencePatternBrush = fabric.util.createClass(fabric.PencilBrush, {
+    type: 'SequencePatternBrush',
+    initialize: function (canvas) {
+        this.canvas = canvas.upperCanvasEl;
+        this.ctx = this.canvas.getContext("2d");
+        this.mainCanvas = canvas;
+        this.gap = 30; // Gap between pattern images
+        this.lastDrawnPointer = null;
+        this.index = 0;
+        this.patternImage =[]
+        this.loadSequence()
+    },
+    loadSequence:function(){
+        for(var i=0;i<8;i++){
+            this.patternImage[i] = new Image();
+            this.patternImage[i].src = 'assets/images/dog/'+(i+1)+'.png';
+            this.patternWidth = 30; // Assuming image size is 30x30
+            this.patternHeight = 30;
+        }
+      
+    },
+    onMouseDown: function (pointer, options) {
+        this.startPointer = pointer;
+        this.drawPatternImage(pointer.x, pointer.y);
+    },
+    onMouseMove: function (pointer, options) {
+        if (this.lastDrawnPointer) {
+            var distance = this.calculateDistance(this.lastDrawnPointer, pointer);
+            if (distance >= this.gap) {
+                this.drawPatternImage(pointer.x, pointer.y);
+                this.lastDrawnPointer = pointer;
+            }
+        } else {
+            this.drawPatternImage(pointer.x, pointer.y);
+            this.lastDrawnPointer = pointer;
+        }
+    },
+    onMouseUp: function (pointer) {
+        var imageDataUrl = this.mainCanvas.upperCanvasEl.toDataURL('image/png');
+
+        fabric.Image.fromURL(imageDataUrl, (img) => {
+            img.set({
+                left: 0,
+                top: 0,
+                selectable: false
+            });
+            this.mainCanvas.add(img);
+        });
+
+        // Reset lastDrawnPointer on mouse up
+        this.lastDrawnPointer = null;
+        this.index  =0;
+    },
+    drawPatternImage: function (x, y) {
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.ctx.drawImage(this.patternImage[(this.index)%7], -15, -15, this.patternWidth, this.patternHeight);
+        this.ctx.restore();
+        this.index++;
+    },
+    calculateDistance: function (point1, point2) {
+        var deltaX = point2.x - point1.x;
+        var deltaY = point2.y - point1.y;
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
+});
+
+
+
 (function (global) {
     'use strict';
 
@@ -1913,3 +2198,202 @@ app.directive('toolbar', function () {
         }
     });
 })(typeof exports !== 'undefined' ? exports : this);
+
+fabric.SmudgeBrush = fabric.util.createClass(fabric.PencilBrush, {
+    type: "SmudgeBrush",
+
+    initialize(canvas, radius, hardness, alpha) {
+        this.canvas = canvas;
+        this.radius = radius;
+        this.hardness = hardness;
+        this.alpha = alpha;
+        this.createTempCanvas();
+        this.updateBrushDisplay(radius, alpha);
+        this.lastX = 0;
+        this.lastY = 0;
+        this.lastForce = 1;
+    },
+
+    createTempCanvas() {
+        this.brushCanvas = document.createElement("canvas");
+        this.brushCanvas.width = this.radius * 2;
+        this.brushCanvas.height = this.radius * 2;
+        this.brushCanvasContext = this.brushCanvas.getContext("2d");
+    },
+
+    updateBrushDisplay(radius, alpha) {
+        this.brushCanvasContext.clearRect(
+            0,
+            0,
+            this.brushCanvas.width,
+            this.brushCanvas.height
+        );
+        this.brushCanvasContext.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+        this.brushCanvasContext.beginPath();
+        this.brushCanvasContext.arc(
+            this.brushCanvas.width / 2,
+            this.brushCanvas.height / 2,
+            radius,
+            0,
+            2 * Math.PI
+        );
+        this.brushCanvasContext.fill();
+    },
+
+    onMouseDown(pointer, options) {
+        this.lastX = pointer.x;
+        this.lastY = pointer.y;
+        this.lastForce = options.pressure || 1;
+        this.updateBrush(pointer.x, pointer.y);
+    },
+
+    onMouseMove(pointer, options) {
+        if (!this.isDown) {
+            return;
+        }
+
+        const force = options.pressure || 1;
+        const line = this.setupLine(
+            this.lastX,
+            this.lastY,
+            pointer.x,
+            pointer.y
+        );
+        for (let more = true; more;) {
+            more = this.advanceLine(line);
+            const alpha = this.alpha * lerp(this.lastForce, force, line.u);
+            this.drawBrush(line.position[0], line.position[1], alpha);
+        }
+        this.lastX = pointer.x;
+        this.lastY = pointer.y;
+        this.lastForce = force;
+    },
+
+    onMouseUp() {
+        // Handle mouse up
+    },
+
+    setupLine(x, y, targetX, targetY) {
+        // Setup line for drawing
+        const deltaX = targetX - x;
+        const deltaY = targetY - y;
+        const deltaRow = Math.abs(deltaX);
+        const deltaCol = Math.abs(deltaY);
+        const counter = Math.max(deltaCol, deltaRow);
+        const axis = counter == deltaCol ? 1 : 0;
+
+        // setup a line draw.
+        return {
+            position: [x, y],
+            delta: [deltaX, deltaY],
+            deltaPerp: [deltaRow, deltaCol],
+            inc: [Math.sign(deltaX), Math.sign(deltaY)],
+            accum: Math.floor(counter / 2),
+            counter: counter,
+            endPnt: counter,
+            axis: axis,
+            u: 0,
+        };
+    },
+
+    advanceLine(line) {
+        // Advance line for drawing
+        --line.counter;
+        line.u = 1 - line.counter / line.endPnt;
+        if (line.counter <= 0) {
+            return false;
+        }
+        const axis = line.axis;
+        const perp = 1 - axis;
+        line.accum += line.deltaPerp[perp];
+        if (line.accum >= line.endPnt) {
+            line.accum -= line.endPnt;
+            line.position[perp] += line.inc[perp];
+        }
+        line.position[axis] += line.inc[axis];
+        return true;
+    },
+
+    drawBrush(x, y, alpha) {
+        const ctx = this.canvas.contextTop;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.globalCompositeOperation = "destination-over";
+        ctx.drawImage(
+            this.brushCanvas,
+            x - this.radius,
+            y - this.radius,
+            this.radius * 2,
+            this.radius * 2
+        );
+        ctx.restore();
+    },
+
+    updateBrush(x, y) {
+        // Update brush
+        let width = this.brushCanvas.width;
+        let height = this.brushCanvas.height;
+        let srcX = x - width / 2;
+        let srcY = y - height / 2;
+        // draw it in the middle of the brush
+        let dstX = (this.brushCanvas.width - width) / 2;
+        let dstY = (this.brushCanvas.height - height) / 2;
+
+        // clear the brush canvas
+        this.brushCanvasContext.clearRect(
+            0,
+            0,
+            this.brushCanvas.width,
+            this.brushCanvas.height
+        );
+
+        // clip the rectangle to be inside
+        if (srcX < 0) {
+            width += srcX;
+            dstX -= srcX;
+            srcX = 0;
+        }
+        const overX = srcX + width - this.canvas.width;
+        if (overX > 0) {
+            width -= overX;
+        }
+
+        if (srcY < 0) {
+            dstY -= srcY;
+            height += srcY;
+            srcY = 0;
+        }
+        const overY = srcY + height - this.canvas.height;
+        if (overY > 0) {
+            height -= overY;
+        }
+
+        if (width <= 0 || height <= 0) {
+            return;
+        }
+
+        this.brushCanvasContext.drawImage(
+            this.canvas.lowerCanvasEl,
+            srcX,
+            srcY,
+            width,
+            height,
+            dstX,
+            dstY,
+            width,
+            height
+        );
+
+        this.feather(this.brushCanvasContext);
+    },
+
+    feather(ctx) {
+        // feather the brush
+        ctx.save();
+        ctx.globalCompositeOperation = "destination-out";
+        const { width, height } = ctx.canvas;
+        ctx.translate(width / 2, height / 2);
+        ctx.fillRect(-width / 2, -height / 2, width, height);
+        ctx.restore();
+    },
+});

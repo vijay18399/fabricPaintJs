@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fabric Custom Brush</title>
+    <!-- Include Fabric.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.0/fabric.min.js"></script>
+    <script src="./br.js"></script>
+    <style>
+      #canvas {
+        border: 1px solid black;
+      }
+      .controls {
+        margin-left: 5px;
+      }
+      .split {
+        display: flex;
+      }
+      * {
+        user-select: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="split">
+      <canvas id="canvas" width="800" height="600"></canvas>
+      <div>
+        <div class="controls">
+          <div>
+            <div>
+              <input
+                type="range"
+                id="radius"
+                min="2"
+                max="40"
+                value="16"
+              /><label for="radius">radius</label>
+            </div>
+            <div>
+              <input
+                type="range"
+                id="hardness"
+                min="0"
+                max="1"
+                step="0.01"
+                value="0.5"
+              /><label for="radius">hardness</label>
+            </div>
+            <div>
+              <input
+                type="range"
+                id="alpha"
+                min="0"
+                max="1"
+                step="0.01"
+                value="0.5"
+              /><label for="alpha">alpha</label>
+            </div>
+            <button type="button" id="reset">reset</button>
+          </div>
+          <div style="text-align: right">
+            <canvas id="brush-display" width="80" height="80"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const canvas = new fabric.Canvas("canvas", {
+        isDrawingMode: true,
+      });
+
+      const radiusElem = document.querySelector("#radius");
+      const hardnessElem = document.querySelector("#hardness");
+      const alphaElem = document.querySelector("#alpha");
+      radiusElem.addEventListener("input", updateBrushSettings);
+      hardnessElem.addEventListener("input", updateBrushSettings);
+      alphaElem.addEventListener("input", updateBrushSettings);
+      document.querySelector("#reset").addEventListener("click", reset);
+      updateBrushSettings()
+      function updateBrushSettings() {
+        const radius = parseInt(radiusElem.value, 10);
+        const hardness = parseFloat(hardnessElem.value);
+        const alpha = parseFloat(alphaElem.value);
+        const customBrush = new fabric.CustomBrush(canvas, radius, hardness, alpha);
+        canvas.freeDrawingBrush = customBrush;
+        fabric.Image.fromURL('assets/bg.jpg', function (img) {
+            img.set({
+                left: 0,
+                top: 0,
+                selectable: false, // Make the background image non-selectable
+                evented: false, // Make the background image non-evented
+            });
+        
+            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+        });
+      }
+
+      function reset() {
+        canvas.clear();
+        updateBrushSettings();
+      }
+
+       </script>
+  </body>
+</html>

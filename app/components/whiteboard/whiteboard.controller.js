@@ -22,7 +22,18 @@ app.controller('WhiteboardController', function ($scope) {
         var lowerCanvas = canvas.lowerCanvasEl;
         lowerCanvas.width = canvas.width;
         lowerCanvas.height = canvas.height;
+        fabric.Image.fromURL('assets/bg.jpg', function (img) {
+            img.set({
+                left: 0,
+                top: 0,
+                selectable: false, // Make the background image non-selectable
+                evented: false, // Make the background image non-evented
+            });
+        
+            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+        });
     }
+
     $scope.init();
     $scope.handleTool = function () {
         canvas.isDrawingMode = true;
@@ -58,7 +69,6 @@ app.controller('WhiteboardController', function ($scope) {
    
     $scope.handleBrush= function(){
         canvas.freeDrawingBrush =  new fabric[$scope.activePattern + 'Brush'](canvas);
-
     }
     $scope.setActiveColor = function (color) {
         $scope.activeColor = color;

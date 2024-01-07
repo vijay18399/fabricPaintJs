@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Transformation</title>
+</head>
+<body>
+
+<h4>Original Image</h4>
+<img id="testImage" src='assets\brushes\cutout_square_diamond.png'/>
+
+<h4>Modified Image copied to an image tag</h4>
+<img id="imageData"/>
+
+<script>
+function transformImageColor(imageUrl, fromColor, toColor, callback) {
+    var img = new Image();
+    img.crossOrigin = "Anonymous"; // Enable cross-origin resource sharing (CORS)
+
+    img.onload = function() {
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+
+        // Set canvas size to match the image
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+
+        var imgData = ctx.getImageData(0, 0, img.width, img.height);
+        var pixels = imgData.data;
+
+        // Convert "from" color to RGBA format
+        var fromColorRGBA = fromColor.concat(255); // Assuming full opacity
+
+        // Loop through pixels and replace "from" color with "to" color
+        for (var i = 0; i < pixels.length; i += 4) {
+            if (pixels[i] === fromColorRGBA[0] &&
+                pixels[i + 1] === fromColorRGBA[1] &&
+                pixels[i + 2] === fromColorRGBA[2] &&
+                pixels[i + 3] === fromColorRGBA[3]) {
+                
+                pixels[i] = toColor[0];
+                pixels[i + 1] = toColor[1];
+                pixels[i + 2] = toColor[2];
+                pixels[i + 3] = toColor[3];
+            }
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+
+        // If a callback is provided, invoke it with the modified image data
+        if (callback && typeof callback === "function") {
+            callback(canvas.toDataURL("image/png"));
+        }
+    };
+
+    img.src = imageUrl;
+}
+
+// Example usage:
+var fromColor = [0, 0, 0]; // Black
+var toColor = [255, 0, 0, 255]; // Red
+
+transformImageColor('assets/brushes/cutout_square_diamond.png', fromColor, toColor, function(modifiedImageData) {
+    var savedImageData = document.getElementById("imageData");
+    savedImageData.src = modifiedImageData;
+});
+</script>
+
+</body>
+</html>

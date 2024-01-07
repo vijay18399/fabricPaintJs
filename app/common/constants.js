@@ -18,7 +18,7 @@ COLORS = [
   ];
   
 TOOLS = [
-    { name: "paint", icon : "brush", subName: 'Brushes',  subCategory: ['Pencil', 'Crayon','Ink','Marker','Fur','Longfur','Ribbon','Shaded','Sketchy','Spraypaint','Squares','Web'], defaultPattern: "Pencil"},
+    { name: "paint", icon : "brush", subName: 'Brushes',  subCategory: ['Pencil', 'Crayon','Ink','Marker','Fur','Longfur','Ribbon','Shaded','Sketchy','Spraypaint','Squares','Web','CustomPattern','SequencePattern','PatternLine','MagicFilter'], defaultPattern: "Smudge"},
     { name: "shapes",icon : "panorama_fish_eye", subName: 'Shapes', subCategory: ["circle", "square", "ellipse"], defaultPattern: "circle" },
     { name: "stamps", icon : "crop_original", subName: 'Stamps',  subCategory: ["frog","dog","lion","parrot","pegion","shark","turtle"], defaultPattern: "frog" },
     { name: "fill", icon : "format_color_fill",  subCategory: [] },
